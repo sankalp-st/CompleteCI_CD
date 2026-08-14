@@ -45,6 +45,14 @@ An end-to-end GitOps CI/CD pipeline for a Java Spring Boot application. Continuo
   - `9000` — SonarQube
 - SSH into the instance using your PEM key.
 
+<p align="center">
+  <img src="assets/AWS_setup.png" width="49%" alt="AWS console" />
+  <img src="assets/EC2_Setup.png" width="49%" alt="Launching the EC2 instance" />
+</p>
+<p align="center">
+  <img src="assets/connect_to_ec2.png" width="49%" alt="Connecting to EC2 via SSH" />
+</p>
+
 ## 2. Install & Configure Jenkins
 
 ```bash
@@ -62,6 +70,14 @@ sudo apt install jenkins -y
 - Complete the setup wizard, then install these plugins under **Manage Jenkins → Plugins → Available Plugins**:
   - `Docker Pipeline`
   - `SonarQube Scanner`
+
+<p align="center">
+  <img src="assets/install_jdk.png" width="49%" alt="Installing JDK on the EC2 server" />
+  <img src="assets/ec2_jenkins.png" width="49%" alt="Unlocking Jenkins with the initial admin password" />
+</p>
+<p align="center">
+  <img src="assets/install_jenkins_plugins.png" width="80%" alt="Installed Jenkins plugins" />
+</p>
 
 ## 3. Set Up SonarQube
 
@@ -89,6 +105,10 @@ sudo systemctl restart docker
 sudo systemctl restart jenkins
 ```
 
+<p align="center">
+  <img src="assets/install_docker_on_EC2_server.png" width="80%" alt="Installing Docker on the EC2 server" />
+</p>
+
 Under **Manage Jenkins → Credentials → System → Global Credentials**, add:
 
 | Credential                  | Type               | ID            |
@@ -96,6 +116,11 @@ Under **Manage Jenkins → Credentials → System → Global Credentials**, add:
 | SonarQube token               | Secret text         | `sonar-token` |
 | Docker Hub username/password  | Username & password | `docker-cred` |
 | GitHub Personal Access Token  | Secret text         | `github`      |
+
+<p align="center">
+  <img src="assets/added_sonar_cofig_to_jenkins.png" width="49%" alt="SonarQube token added to Jenkins credentials" />
+  <img src="assets/added_all_the_credentials_.png" width="49%" alt="All credentials configured in Jenkins" />
+</p>
 
 ## 5. Create the Pipeline
 
@@ -113,6 +138,13 @@ In Jenkins, create a **Pipeline** job:
 - Branch: `main`
 - Script path: `spring-boot-app/Jenkinsfile`
 
+<p align="center">
+  <img src="assets/Create_a_Pipeline_in_Jenkins.png" width="80%" alt="Creating a new Pipeline job in Jenkins" />
+</p>
+<p align="center">
+  <img src="assets/after_10_attemps_ci_pipeline_was_done.png" width="80%" alt="CI pipeline stages passing" />
+</p>
+
 ## 6. Install Argo CD & Deploy
 
 Start a cluster (example uses Minikube):
@@ -121,12 +153,21 @@ Start a cluster (example uses Minikube):
 minikube start --driver=hyperkit
 ```
 
+<p align="center">
+  <img src="assets/install_minikube.png" width="60%" alt="Installing Minikube" />
+</p>
+
 Install Argo CD:
 
 ```bash
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
+
+<p align="center">
+  <img src="assets/install_argoCD_in_local_k8s_cluster.png" width="49%" alt="Argo CD login screen" />
+  <img src="assets/setup_argoCD.png" width="49%" alt="Creating an Argo CD application" />
+</p>
 
 Expose the Argo CD server (change the service to `NodePort`, or use `kubectl port-forward`).
 
@@ -149,6 +190,27 @@ In the Argo CD UI:
 
 - **CI**: Trigger the Jenkins pipeline manually or via a GitHub webhook. Confirm the SonarQube report at `http://<EC2-Public-IP>:9000`.
 - **CD**: Once Jenkins commits the new image tag, Argo CD detects the change in the manifest repo and performs a rolling update on the Kubernetes deployment automatically.
+
+<p align="center">
+  <img src="assets/complete_argoCD_setup.png" width="80%" alt="Argo CD application synced and healthy" />
+</p>
+
+**Docker image pushed & running locally**
+
+<p align="center">
+  <img src="assets/docker_image_created_after_complete_cicd_.png" width="49%" alt="Docker image pushed to Docker Hub" />
+  <img src="assets/DockerContainer_in_local.png" width="49%" alt="Container running locally in Docker Desktop" />
+</p>
+<p align="center">
+  <img src="assets/run_app_through_docker_container.png" width="49%" alt="App running via Docker container" />
+  <img src="assets/app_running_on_localhost.png" width="49%" alt="App running on localhost" />
+</p>
+
+**Final result — running end-to-end on the EC2/Kubernetes deployment**
+
+<p align="center">
+  <img src="assets/final_result_which_is_running_on_the_EC2_server_with_complete_CICD.png" width="80%" alt="Final application running after the complete CI/CD pipeline" />
+</p>
 
 ---
 
