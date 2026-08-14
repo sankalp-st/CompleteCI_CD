@@ -1,0 +1,89 @@
+#### Local Testing #####
+
+    setup maven ->
+        -download and install maven bin file on your local system
+        -code (cd CompleteCI_CDProject\java-maven-sonar-argocd-helm-k8s\spring-boot-app)
+        -code (mvn clean package) to install maven 
+    Execute locally (Java 11 needed) and access the application on http://localhost:8080 ->
+        -code (java -jar target/spring-boot-web.jar)
+    Build Using Docker ->
+        -Run DockerDesktop(DockerEngine) in Bacground 
+        -code (docker build -t ultimate-cicd-pipeline:v1 .) to build docker image 
+        -code (docker run -d -p 8010:8080 -t ultimate-cicd-pipeline:v1) to run docker image 
+        -get your IP Address with code(ipconfig) select ipv4
+        -access application on http://<ip-address>:8010
+
+#### Setup Complete CI/CD Pipeline ####
+
+    setup aws account -> 
+        create an aws account
+        create a EC2 ->
+            ubantu OS
+            m7i-flex.large (8gib RAM and 2vCPUs)
+    
+    connect to EC2 with MobaXtream ->
+        use username as ubantu and pem key to connect 
+
+    install jdk on EC2 ->
+        Code(sudo apt update)
+        Code(sudo apt install openjdk-17-jre)
+    install Jenkins on EC2 ->
+        code(# 1. Remove the old Jenkins repository configuration
+            sudo rm -f /etc/apt/sources.list.d/jenkins.list
+
+            # 2. Remove the old Jenkins key
+            sudo rm -f /usr/share/keyrings/jenkins-keyring.asc
+
+            # 3. Install Java 21 (required by current Jenkins)
+            sudo apt update
+            sudo apt install -y fontconfig openjdk-21-jre
+
+            # 4. Add the NEW Jenkins 2026 signing key
+            sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+            https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+
+            # 5. Add Jenkins LTS repository
+            echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+            https://pkg.jenkins.io/debian-stable binary/ | \
+            sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+            # 6. Update repositories
+            sudo apt update
+
+            # 7. Install Jenkins
+            sudo apt install -y jenkins)
+    
+    Allow inbound Traffic in EC2server ->
+        edit enbound rules add From everywhere 
+
+    Access Jenkins ->
+        -on your browser (http://<EC2-Public-IP>:8080)
+        -code(sudo cat /var/lib/jenkins/secrets/initialAdminPassword) to get the jenkins password 
+        -pass:3026db467f4c4907bd29c31be6e4d75e
+        -select these options (1. install suggested plugins in jenkins
+        2. skip and continue as admin 
+        3. save and finish)
+
+    Add Pipeline to Jenkis ->
+        git path to your git repo and add the jinkins file 
+        install plugins ->
+            Docker Pipeline 
+            SonarQube Scanner
+
+    Set Up SonarQube Server ->
+        code(sudo adduser sonarqube)
+        crate pass : sankalp
+        code(sudo su - sonarqube)
+        Download and extract the SonarQube binary ->
+            code(wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.0.65466.zip
+            unzip sonarqube-*.zip)
+        switch user to admin to unzip it code(unzip sonarqube-*.zip)
+
+
+
+
+
+
+
+
+
