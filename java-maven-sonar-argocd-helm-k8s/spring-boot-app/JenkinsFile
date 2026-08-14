@@ -5,6 +5,15 @@ pipeline {
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
   }
+  stage('Update Docker CLI') {
+    steps {
+        sh '''
+            apt-get update
+            apt-get install -y docker.io
+            docker --version
+        '''
+    }
+}
   stages {
     stage('Check Docker') {
     steps {
